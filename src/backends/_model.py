@@ -17,7 +17,7 @@ def get_model(device: str = 'auto') -> torch.nn.Module:
             'cpu'
         )
 
-    model = torch.load('resources/models/model_resnet101.pth')
+    model = torch.load('resources/models/model_densenet121.pth')
     return model.to(device)
 
 
