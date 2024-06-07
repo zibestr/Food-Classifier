@@ -1,6 +1,7 @@
 import os
 from base64 import b64encode
 from io import BytesIO
+from shutil import rmtree
 from src.backends import ImageClassifier
 from tempfile import TemporaryDirectory
 from patoolib import extract_archive
@@ -11,22 +12,21 @@ from PIL import Image
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = os.path.join(basedir, 'uploads')
+app.config['UPLOAD_FOLDER'] = os.path.join(basedir, 'tmp')
 app.config['SECRET_KEY'] = 'PYTORCH is COOL'
 ALLOWED_EXTENSIONS = ('png', 'jpg', 'jpeg', 'gif', 'rar', 'zip', 'tz')
-user_files: dict[int, str] = {}
 
 with open('resources/data/labels.txt') as labels_file:
     classification_model = ImageClassifier(
         labels=labels_file.read().split('\n'),
         image_size=224,
         normalize_means=[0.485, 0.456, 0.406],
-        normalize_stds=[0.229, 0.224, 0.225]
+        normalize_stds=[0.229, 0.224, 0.225],
+        device='cpu'
     )
 
 
 def allowed_file(filename: str) -> bool:
-    print(filename)
     return ('.' in filename and
             filename.split('.')[-1].lower() in ALLOWED_EXTENSIONS)
 
@@ -87,9 +87,10 @@ def upload_file():
                                   ALLOWED_EXTENSIONS)),
                     400)
 
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        user_hash = hash(request.remote_addr)
-        user_files[user_hash] = filename
+        dir_path = os.path.join(app.config['UPLOAD_FOLDER'],
+                                str(hash(request.remote_addr)))
+        os.mkdir(dir_path, mode=0o777)
+        file.save(os.path.join(dir_path, filename))
 
         return redirect('predict')
     return render_template('index.html')
@@ -97,8 +98,11 @@ def upload_file():
 
 @app.route('/predict')
 def predict_page():
-    user_hash = hash(request.remote_addr)
-    images = extract_files(user_files[user_hash])
+    dir_path = os.path.join(app.config['UPLOAD_FOLDER'],
+                            str(hash(request.remote_addr)))
+    filename = os.listdir(dir_path)[0]
+    images = extract_files(os.path.join(dir_path, filename))
+    rmtree(dir_path)
     results = [get_top5(dict_).items()
                for dict_ in classification_model.predict(images)]
     return render_template('predict_page.html',

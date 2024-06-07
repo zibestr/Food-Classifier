@@ -1,5 +1,4 @@
 import torch
-from torch import nn
 from PIL import Image
 from torchvision.transforms import (
     Compose,
@@ -65,7 +64,7 @@ class ImageClassifier:
 
             logits = self.model(input_tensor)
 
-        return {name: round(nn.functional.sigmoid(value).item() * 100, 2)
+        return {name: value.item()
                 for name, value in zip(self.labels, logits[0])}
 
     def predict(self, images: list[Image.Image]) -> list[dict[str, float]]:
