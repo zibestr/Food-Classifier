@@ -12,7 +12,7 @@
                 <image src="{{ item[1] }}"></image>
                 <ul>
                     {% for predicted_class in item[0] %}
-                        <li>{{ predicted_class[0] }}: {{ predicted_class[1] }}%</li>
+                        <li>Возможная еда: {{ predicted_class }}</li>
                     {% endfor %}
                 </ul>
             </div>

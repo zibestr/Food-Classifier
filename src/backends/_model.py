@@ -6,6 +6,7 @@ from torchvision.transforms import (
     ToTensor,
     Normalize
 )
+from torchvision import models
 
 
 def get_model(device: str = 'auto') -> torch.nn.Module:
@@ -16,7 +17,11 @@ def get_model(device: str = 'auto') -> torch.nn.Module:
             'cpu'
         )
 
-    model = torch.load('resources/models/model_densenet121.pth')
+    model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
+    for param in model.parameters():
+        param.requires_grad = False
+
+    model.fc = torch.load('resources/models/resnet18_fc.pth')
     return model.to(device)
 
 

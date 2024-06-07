@@ -49,10 +49,10 @@ def extract_files(filename: str) -> list[Image.Image]:
     return images
 
 
-def get_top5(results: dict[str, float]) -> dict[str, float]:
-    top5 = dict(item for item in sorted(results.items(),
-                                        key=lambda value: value[1],
-                                        reverse=True)[:5])
+def get_top5(results: dict[str, float]) -> list[str]:
+    top5 = [item[0] for item in sorted(results.items(),
+                                       key=lambda value: value[1],
+                                       reverse=True)[:5]]
     return top5
 
 
@@ -103,7 +103,7 @@ def predict_page():
     filename = os.listdir(dir_path)[0]
     images = extract_files(os.path.join(dir_path, filename))
     rmtree(dir_path)
-    results = [get_top5(dict_).items()
+    results = [get_top5(dict_)
                for dict_ in classification_model.predict(images)]
     return render_template('predict_page.html',
                            results=zip(results,
