@@ -59,7 +59,7 @@ class ImageClassifier:
             input_tensor = self._preprocessor(image).to(
                 self.device,
                 dtype=torch.float32
-            ) / 255
+            )
             input_tensor = self._normalize(input_tensor).reshape(
                 1,
                 3,
