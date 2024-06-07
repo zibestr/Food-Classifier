@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Результаты предсказания</title>
+        <link type="text/css" href="{{ url_for('static', filename='styles.css')}}" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="main_block">
+            <h1>Результаты предсказания</h1>
+            {% for item in results %}
+            <div class="predicted">
+                <image src="{{ item[1] }}"></image>
+                <ul>
+                    {% for predicted_class in item[0] %}
+                        <li>{{ predicted_class[0] }}: {{ predicted_class[1] }}%</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        </div>
+    </body>
+</html>

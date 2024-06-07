@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Загрузить новый файл</title>
+        <link type="text/css" href="{{ url_for('static', filename='styles.css')}}" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="main_block">
+            <h1>Загрузить новый файл</h1>
+            <form method=post enctype=multipart/form-data>
+              <input type=file name=file>
+              <input type=submit value=Upload>
+            </form>
+          </div>
+        </div>
+    </body>
+</html>
