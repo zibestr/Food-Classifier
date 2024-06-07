@@ -32,27 +32,27 @@ class Trainer:
         self.loss_func = loss_fn
         self.model = model
 
-        self.optimizer = torch.optim.Optimizer(model.classifier.parameters(),
+        self.optimizer = torch.optim.Optimizer(model.fc.parameters(),
                                                defaults={})
         match optimizer:
             case 'adam':
                 self.optimizer = torch.optim.Adam(
-                    model.classifier.parameters(),
+                    model.fc.parameters(),
                     lr=learning_rate
                 )
             case 'adamax':
                 self.optimizer = torch.optim.Adamax(
-                    model.classifier.parameters(),
+                    model.fc.parameters(),
                     lr=learning_rate
                 )
             case 'adagrad':
                 self.optimizer = torch.optim.Adagrad(
-                    model.classifier.parameters(),
+                    model.fc.parameters(),
                     lr=learning_rate
                 )
             case 'sgd':
                 self.optimizer = torch.optim.SGD(
-                    model.classifier.parameters(),
+                    model.fc.parameters(),
                     lr=learning_rate
                 )
             case _:
