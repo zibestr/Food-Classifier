@@ -5,7 +5,10 @@ from torchvision.transforms import (
     Compose,
     ToTensor,
     Resize,
-    Normalize
+    Normalize,
+    RandomRotation,
+    RandomHorizontalFlip,
+    RandomResizedCrop
 )
 
 
@@ -38,10 +41,18 @@ class FoodDataset(Dataset):
             with open(f'{self.data_directory}/meta/test.txt') as file:
                 self.image_files = file.read().split('\n')[:-1]
 
-        self._transformer = Compose([
-            Resize((image_size, image_size)),
-            ToTensor()
-        ])
+        if train:
+            self._transformer = Compose([
+                RandomRotation(30),
+                RandomHorizontalFlip(),
+                RandomResizedCrop((image_size, image_size)),
+                ToTensor()
+            ])
+        else:
+            self._transformer = Compose([
+                Resize((image_size, image_size)),
+                ToTensor()
+            ])
         self._normalize = Normalize(normalize_means, normalize_stds)
 
     def __getitem__(self, index: int) -> tuple[torch.Tensor,
@@ -54,7 +65,7 @@ class FoodDataset(Dataset):
                               device=self.device,
                               dtype=torch.float32)
         inputs = self._transformer(image).to(self.device,
-                                             dtype=torch.float32) / 255
+                                             dtype=torch.float32)
         return (self._normalize(inputs), target)
 
     def __len__(self) -> int:
