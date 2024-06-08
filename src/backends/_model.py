@@ -1,15 +1,13 @@
 import torch
 from PIL import Image
-from torchvision.transforms import (
-    Compose,
-    Resize,
-    ToTensor,
-    Normalize
-)
 from torchvision import models
+from torchvision.transforms import Compose, Normalize, Resize, ToTensor
 
 
 def get_model(device: str = 'auto') -> torch.nn.Module:
+    '''
+    Возвращает ResNet-50 с обученным на Food-101 слоем fc
+    '''
     if device == 'auto':
         device = (
             'cuda' if torch.cuda.is_available() else
@@ -26,6 +24,9 @@ def get_model(device: str = 'auto') -> torch.nn.Module:
 
 
 class ImageClassifier:
+    '''
+    Класс классификатора изображений
+    '''
     def __init__(
         self,
         labels: list[str],

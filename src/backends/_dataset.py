@@ -1,18 +1,13 @@
 import torch
-from torch.utils.data import Dataset
 from PIL import Image
-from torchvision.transforms import (
-    Compose,
-    ToTensor,
-    Resize,
-    Normalize,
-    RandomRotation,
-    RandomHorizontalFlip,
-    RandomResizedCrop
-)
+from torch.utils.data import Dataset
+from torchvision.transforms import (Compose, Normalize, RandomHorizontalFlip,
+                                    RandomResizedCrop, RandomRotation, Resize,
+                                    ToTensor)
 
 
 class FoodDataset(Dataset):
+    '''Класс датасета'''
     def __init__(self,
                  data_directory: str,
                  image_size: int,

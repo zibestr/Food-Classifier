@@ -1,10 +1,14 @@
 from typing import Literal
+
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, Dataset
 
 
 class Trainer:
+    '''
+    Класс для обучения и тестирования нейронной сети
+    '''
     def __init__(
         self,
         train_dataset: Dataset,

@@ -2,12 +2,14 @@ import os
 from base64 import b64encode
 from io import BytesIO
 from shutil import rmtree
-from src.backends import ImageClassifier
 from tempfile import TemporaryDirectory
+
+from flask import Flask, redirect, render_template, request
 from patoolib import extract_archive
-from flask import Flask, request, redirect, render_template
-from werkzeug.utils import secure_filename
 from PIL import Image
+from werkzeug.utils import secure_filename
+
+from src.backends import ImageClassifier
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -27,11 +29,17 @@ with open('resources/data/labels.txt') as labels_file:
 
 
 def allowed_file(filename: str) -> bool:
+    '''
+    Проверка на расширение загружаемого файла
+    '''
     return ('.' in filename and
             filename.split('.')[-1].lower() in ALLOWED_EXTENSIONS)
 
 
 def extract_files(filename: str) -> list[Image.Image]:
+    '''
+    Извлекает загруженные файлы в список Pillow изображений
+    '''
     file_extension = filename.split('.')[-1]
     full_filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
@@ -50,6 +58,9 @@ def extract_files(filename: str) -> list[Image.Image]:
 
 
 def get_top5(results: dict[str, float]) -> list[str]:
+    '''
+    Получает 5 наиболее вероятных предсказанных классов
+    '''
     top5 = [item[0] for item in sorted(results.items(),
                                        key=lambda value: value[1],
                                        reverse=True)[:5]]
@@ -57,6 +68,9 @@ def get_top5(results: dict[str, float]) -> list[str]:
 
 
 def get_image_data(image: Image.Image) -> str:
+    '''
+    Переводит Pillow изображение в байтовое представление для отображения на сайте
+    '''
     image_io = BytesIO()
     image.save(image_io, 'PNG')
     dataurl = ('data:image/png;base64,'
@@ -64,15 +78,11 @@ def get_image_data(image: Image.Image) -> str:
     return dataurl
 
 
-def clear_uploads():
-    for filename in os.listdir(app.config['UPLOAD_FOLDER']):
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        if os.path.isfile(file_path):
-            os.remove(file_path)
-
-
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
+    '''
+    Начальная страница загрузки файлов
+    '''
     if request.method == 'POST':
         if 'file' not in request.files:
             return 'Не могу прочитать файл', 400
@@ -98,11 +108,15 @@ def upload_file():
 
 @app.route('/predict')
 def predict_page():
+    '''
+    Страница предсказания загруженных файлов
+    '''
     dir_path = os.path.join(app.config['UPLOAD_FOLDER'],
                             str(hash(request.remote_addr)))
     filename = os.listdir(dir_path)[0]
     images = extract_files(os.path.join(dir_path, filename))
     rmtree(dir_path)
+
     results = [get_top5(dict_)
                for dict_ in classification_model.predict(images)]
     return render_template('predict_page.html',
