@@ -2,7 +2,6 @@ blinker==1.8.2
 click==8.1.7
 filelock==3.14.0
 flask==3.0.3
-flask-uploads==0.2.1
 flask-wtf==1.2.1
 fsspec==2024.6.0
 gunicorn==22.0.0

@@ -107,5 +107,5 @@ class Trainer:
                 dataset_size += len(targets)
                 predicted = self.model(inputs).argmax(dim=1)
                 true_predicted += torch.sum(predicted == targets).item()
-                print(f'{i + 1}/{len(self.test_data)}')
+                print(f'{i + 1}/{len(self.test_data)}', true_predicted, dataset_size)
         return true_predicted / dataset_size
